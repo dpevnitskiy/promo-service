@@ -132,9 +132,8 @@ def webhook():
 
 @app.route("/health", methods=["GET"])
 def health():
-    """Проверка что сервис живой."""
-    free = supabase.table("promocodes").select("code", count="exact").eq("status", "free").execute()
-    return jsonify({"status": "ok", "free_codes": free.count}), 200
+    free = supabase.table("promocodes").select("code").eq("status", "free").execute()
+    return jsonify({"status": "ok", "free_codes": len(free.data)}), 200
 
 
 if __name__ == "__main__":
