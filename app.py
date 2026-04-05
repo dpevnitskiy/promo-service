@@ -80,7 +80,7 @@ def mark_code_used(code_id, email):
 def email_already_received(email):
     """Проверяет, получал ли этот email промокод раньше."""
     result = supabase.table("promocodes") \
-        .select("id") \
+        .select("code") \
         .eq("sent_to", email) \
         .eq("status", "used") \
         .execute()
