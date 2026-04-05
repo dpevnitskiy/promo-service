@@ -98,7 +98,9 @@ def send_email(to_email, promo_code):
     msg.attach(MIMEText(html_body, "html", "utf-8"))
 
     with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-    server.starttls()
+        server.starttls()
+        server.login(SMTP_USER, SMTP_PASS)
+        server.sendmail(SMTP_USER, to_email, msg.as_string())
 
 
 @app.route("/webhook", methods=["POST"])
