@@ -59,21 +59,21 @@ EMAIL_HTML_TEMPLATE = """<!DOCTYPE html>
 def get_next_promocode():
     """Берёт следующий свободный промокод из базы."""
     result = supabase.table("promocodes") \
-        .select("id, code") \
+        .select("code") \
         .eq("status", "free") \
         .limit(1) \
         .execute()
     if not result.data:
         return None, None
-    row = result.data[0]
-    return row["id"], row["code"]
+    code = result.data[0]["code"]
+    return code, code
 
 
-def mark_code_used(code_id, email):
+def mark_code_used(code, email):
     """Помечает промокод как использованный и сохраняет email."""
     supabase.table("promocodes") \
         .update({"status": "used", "sent_to": email}) \
-        .eq("id", code_id) \
+        .eq("code", code) \
         .execute()
 
 
@@ -132,11 +132,10 @@ def webhook():
 
 @app.route("/health", methods=["GET"])
 def health():
-    result = supabase.table("promocodes").select("code").execute()
-    all_codes = len(result.data)
+    """Проверка что сервис живой."""
     free = supabase.table("promocodes").select("code").eq("status", "free").execute()
-    free_codes = len(free.data)
-    return jsonify({"status": "ok", "total": all_codes, "free_codes": free_codes}), 200
+    return jsonify({"status": "ok", "free_codes": len(free.data)}), 200
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
